@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OreHost — Hosting Minecraft Gratis, Spek Gede</title>
+<meta name="description" content="Hosting Minecraft gratis dengan RAM besar, CPU dedicated, dan NVMe storage lega. Upgrade kapan aja kalau butuh lebih.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" defer></script>
+<style>
+  :root{
+    --bg-void:#14161b;
+    --surface:#1c1f26;
+    --surface-2:#20242c;
+    --line:#2b2f39;
+    --line-soft:#23262f;
+    --text:#ece7da;
+    --text-muted:#8d93a3;
+    --accent:#ff6a3d;
+    --accent-2:#ffb84d;
+    --diamond:#6fe3ff;
+    --emerald:#5fd98a;
+    --iron:#c9cdd6;
+    --coal:#7b8190;
+    --ender:#a78bfa;
+    --grass:#6fbf73;
+    --dirt:#9a6b43;
+    --stoneblock:#5b6470;
+    --radius:10px;
+    --font-display:'Space Grotesk',sans-serif;
+    --font-body:'Inter',sans-serif;
+    --font-mono:'JetBrains Mono',monospace;
+    --container:1180px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg-void);
+    color:var(--text);
+    font-family:var(--font-body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(var(--line-soft) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+    background-size:64px 64px;
+    opacity:.25;
+    pointer-events:none;
+    z-index:0;
+    mask-image:linear-gradient(to bottom, black 0%, transparent 55%);
+  }
+  a{color:inherit;text-decoration:none;}
+  img,svg{display:block;}
+  .wrap{max-width:var(--container);margin:0 auto;padding:0 24px;}
+  section{position:relative;z-index:1;}
+  ::selection{background:var(--accent);color:#1a1208;}
+  *:focus-visible{outline:2px solid var(--accent-2);outline-offset:2px;border-radius:4px;}
+
+  /* ---------- DECORATIVE BLOCK/VOXEL MOTIF ---------- */
+  .block-scene{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:-1;}
+  .mosaic-bg{
+    position:absolute;inset:0;display:grid;opacity:.5;
+    mask-image:radial-gradient(ellipse 85% 70% at 50% 35%, black 0%, transparent 75%);
+  }
+  .mosaic-cell{border-top:1px solid rgba(255,255,255,.05);}
+  .voxel{position:absolute;animation:voxelFloat 7s ease-in-out infinite;}
+  .voxel .vx-top{fill:currentColor;fill-opacity:1;}
+  .voxel .vx-left{fill:currentColor;fill-opacity:.72;}
+  .voxel .vx-right{fill:currentColor;fill-opacity:.5;}
+  @keyframes voxelFloat{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-14px) rotate(2deg);}}
+
+  .ext-icon{width:14px;height:14px;opacity:.75;}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-mono);
+    font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-2);
+    margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,106,61,.18);}
+
+  h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-.01em;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--font-body);font-weight:600;font-size:.95rem;
+    padding:13px 22px;border-radius:8px;border:1px solid transparent;
+    cursor:pointer;transition:transform .15s ease, background .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:var(--accent);color:#1a1208;}
+  .btn-primary:hover{background:var(--accent-2);}
+  .btn-ghost{background:transparent;color:var(--text);border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--text-muted);}
+  .btn-block{width:100%;justify-content:center;}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(20,22,27,.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:68px;}
+  .logo{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:700;font-size:1.15rem;}
+  .logo .logo-icon{
+    width:30px;height:30px;border-radius:7px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:flex;align-items:center;justify-content:center;color:#1a1208;
+  }
+  .logo .logo-icon svg{width:17px;height:17px;}
+  .nav-links{display:flex;align-items:center;gap:32px;font-size:.92rem;color:var(--text-muted);}
+  .nav-links a{transition:color .15s ease;}
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{display:flex;align-items:center;gap:14px;}
+  .nav-toggle{display:none;background:none;border:none;color:var(--text);cursor:pointer;padding:6px;}
+  .mobile-menu{display:none;border-top:1px solid var(--line);padding:18px 24px 22px;flex-direction:column;gap:16px;background:var(--bg-void);}
+  .mobile-menu a{color:var(--text-muted);font-size:.95rem;}
+  .mobile-menu.open{display:flex;}
+
+  @media (max-width:840px){
+    .nav-links,.nav-cta .btn-ghost{display:none;}
+    .nav-toggle{display:block;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 70px;position:relative;z-index:1;overflow:hidden;}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
+  .hero h1{font-size:3.05rem;line-height:1.08;margin-bottom:20px;}
+  .hero h1 .hl{color:var(--accent);}
+  .hero p.lead{color:var(--text-muted);font-size:1.08rem;max-width:480px;margin-bottom:30px;}
+  .hero-ctas{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap;}
+  .hero-note{font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted);}
+
+  /* hero panel mockup */
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px;
+    clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);
+  }
+  .panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .panel-head .pname{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:.85rem;color:var(--text-muted);}
+  .pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--emerald);box-shadow:0 0 0 0 rgba(95,217,138,.5);animation:pulse 2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(95,217,138,.45);}70%{box-shadow:0 0 0 7px rgba(95,217,138,0);}100%{box-shadow:0 0 0 0 rgba(95,217,138,0);}}
+  .status-badge{font-family:var(--font-mono);font-size:.72rem;color:var(--emerald);background:rgba(95,217,138,.1);padding:4px 10px;border-radius:5px;}
+
+  .stat-row{margin-bottom:16px;}
+  .stat-row:last-of-type{margin-bottom:0;}
+  .stat-row .stat-top{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:7px;}
+  .stat-top .stat-label{display:flex;align-items:center;gap:7px;color:var(--text-muted);}
+  .stat-top .stat-label svg{width:14px;height:14px;}
+  .stat-top .stat-val{font-family:var(--font-mono);color:var(--text);}
+  .bar-track{height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;border:1px solid var(--line);}
+  .bar-fill{height:100%;border-radius:4px;width:var(--w);animation:fillIn 1.3s ease-out;}
+  @keyframes fillIn{from{width:0%;}}
+  .bar-ram{background:linear-gradient(90deg,var(--accent),var(--accent-2));}
+  .bar-cpu{background:linear-gradient(90deg,var(--accent-2),var(--emerald));}
+  .bar-disk{background:linear-gradient(90deg,var(--diamond),#3b9fc4);}
+
+  .panel-foot{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line);}
+  .panel-foot .pf-item{text-align:center;}
+  .panel-foot .pf-num{font-family:var(--font-mono);font-weight:600;font-size:1.05rem;}
+  .panel-foot .pf-label{font-size:.7rem;color:var(--text-muted);margin-top:2px;}
+
+  @media (max-width:980px){
+    .hero .wrap{grid-template-columns:1fr;gap:42px;}
+    .hero h1{font-size:2.3rem;}
+  }
+
+  /* ---------- STATS BAR ---------- */
+  .stats-bar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);}
+  .stats-bar .wrap{display:grid;grid-template-columns:repeat(4,1fr);padding:34px 24px;}
+  .stat-item{text-align:center;border-right:1px solid var(--line);}
+  .stat-item:last-child{border-right:none;}
+  .stat-item .big{font-family:var(--font-mono);font-weight:600;font-size:1.7rem;color:var(--accent-2);}
+  .stat-item .small{font-size:.82rem;color:var(--text-muted);margin-top:4px;}
+  @media (max-width:700px){
+    .stats-bar .wrap{grid-template-columns:repeat(2,1fr);gap:24px 0;}
+    .stat-item:nth-child(2){border-right:none;}
+    .stat-item:nth-child(1),.stat-item:nth-child(2){padding-bottom:18px;border-bottom:1px solid var(--line);}
+  }
+
+  /* ---------- SECTION HEAD ---------- */
+  .sec-head{max-width:580px;margin-bottom:48px;}
+  .sec-head h2{font-size:2.15rem;line-height:1.2;margin-bottom:14px;}
+  .sec-head p{color:var(--text-muted);font-size:1.02rem;}
+  .section-pad{padding:90px 0;}
+
+  /* ---------- SPECS ---------- */
+  .specs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  .slot-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:30px 26px;
+    clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+  }
+  .slot-card .slot-icon{
+    width:42px;height:42px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:var(--accent-2);
+  }
+  .slot-card .slot-icon svg{width:20px;height:20px;}
+  .slot-card .slot-num{font-family:var(--font-mono);font-size:2.1rem;font-weight:600;line-height:1;margin-bottom:6px;}
+  .slot-card .slot-label{font-size:.92rem;font-weight:600;margin-bottom:8px;}
+  .slot-card .slot-desc{font-size:.88rem;color:var(--text-muted);}
+  @media (max-width:840px){.specs-grid{grid-template-columns:1fr;}}
+
+  /* ---------- FEATURES ---------- */
+  .features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .feat-card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;transition:border-color .15s ease,transform .15s ease;}
+  .feat-card:hover{border-color:var(--text-muted);transform:translateY(-2px);}
+  .feat-card .fc-icon{width:36px;height:36px;border-radius:8px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--emerald);}
+  .feat-card .fc-icon svg{width:18px;height:18px;}
+  .feat-card h3{font-size:.98rem;margin-bottom:7px;}
+  .feat-card p{font-size:.85rem;color:var(--text-muted);}
+  @media (max-width:980px){.features-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.features-grid{grid-template-columns:1fr;}}
+
+  /* ---------- PRICING ---------- */
+  .pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;align-items:start;}
+  .tier-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:30px;position:relative;
+    clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+  }
+  .tier-card.featured{border-color:var(--accent-2);}
+  .tier-badge{position:absolute;top:-13px;right:24px;background:var(--accent);color:#1a1208;font-family:var(--font-mono);font-size:.7rem;font-weight:600;padding:4px 10px;border-radius:5px;}
+  .tier-top{display:flex;align-items:center;gap:10px;margin-bottom:18px;}
+  .tier-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .tier-icon svg{width:17px;height:17px;}
+  .tier-coal .tier-icon{background:rgba(123,129,144,.15);color:var(--coal);}
+  .tier-wither .tier-icon{background:rgba(201,205,214,.15);color:var(--iron);}
+  .tier-ender .tier-icon{background:rgba(167,139,250,.15);color:var(--ender);}
+  .tier-ender .tier-price{color:var(--ender);}
+  .tier-name{font-family:var(--font-display);font-weight:600;font-size:1.1rem;}
+  .tier-price{font-family:var(--font-mono);font-size:1.9rem;font-weight:600;margin-bottom:4px;}
+  .tier-price span{font-size:.85rem;color:var(--text-muted);font-weight:400;}
+  .tier-sub{font-size:.82rem;color:var(--text-muted);margin-bottom:22px;}
+  .tier-specs{display:flex;flex-direction:column;gap:9px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--line);}
+  .tier-specs .ts-row{display:flex;justify-content:space-between;font-size:.86rem;}
+  .tier-specs .ts-row span:first-child{color:var(--text-muted);}
+  .tier-specs .ts-row span:last-child{font-family:var(--font-mono);}
+  .tier-feats{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+  .tier-feats .tf-row{display:flex;align-items:flex-start;gap:9px;font-size:.85rem;color:var(--text-muted);}
+  .tier-feats .tf-row svg{width:15px;height:15px;color:var(--emerald);flex-shrink:0;margin-top:1px;}
+  .pricing-note{text-align:center;color:var(--text-muted);font-size:.85rem;margin-top:28px;}
+  @media (max-width:980px){.pricing-grid{grid-template-columns:1fr;}}
+
+  /* ---------- STEPS ---------- */
+  .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .step-card{position:relative;padding-top:8px;}
+  .step-num{font-family:var(--font-mono);font-size:.85rem;color:var(--accent-2);margin-bottom:14px;}
+  .step-card h3{font-size:1rem;margin-bottom:8px;}
+  .step-card p{font-size:.86rem;color:var(--text-muted);}
+  .step-card:not(:last-child)::after{
+    content:"";position:absolute;top:14px;left:calc(100% - 4px);width:calc(100% - 16px);height:1px;background:var(--line);
+    display:none;
+  }
+  @media (min-width:981px){.step-card:not(:last-child)::after{display:block;}}
+  @media (max-width:980px){.steps-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.steps-grid{grid-template-columns:1fr;}}
+
+  /* ---------- FAQ ---------- */
+  .faq-list{max-width:760px;}
+  .faq-item{border-bottom:1px solid var(--line);}
+  .faq-q{
+    width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;
+    background:none;border:none;color:var(--text);font-family:var(--font-body);font-size:1rem;font-weight:500;
+    padding:20px 4px;cursor:pointer;text-align:left;
+  }
+  .faq-q svg{width:18px;height:18px;color:var(--text-muted);flex-shrink:0;transition:transform .2s ease;}
+  .faq-item.open .faq-q svg{transform:rotate(180deg);}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;}
+  .faq-a p{color:var(--text-muted);font-size:.92rem;padding:0 4px 20px;max-width:640px;}
+  .faq-item.open .faq-a{max-height:220px;}
+
+  /* ---------- CTA FINAL ---------- */
+  .cta-final{
+    background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:80px 0;text-align:center;overflow:hidden;
+  }
+  .cta-final h2{font-size:2.1rem;margin-bottom:14px;}
+  .cta-final p{color:var(--text-muted);margin-bottom:30px;}
+  .cta-final .hero-ctas{justify-content:center;}
+
+  /* ---------- FOOTER ---------- */
+  footer{padding:60px 0 30px;}
+  .foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px;margin-bottom:46px;}
+  .foot-brand p{color:var(--text-muted);font-size:.88rem;margin-top:12px;max-width:280px;}
+  .foot-col h4{font-size:.85rem;color:var(--text-muted);margin-bottom:14px;font-weight:600;}
+  .foot-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+  .foot-col a{font-size:.88rem;color:var(--text-muted);transition:color .15s ease;}
+  .foot-col a:hover{color:var(--text);}
+  .foot-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .foot-bottom p{font-size:.78rem;color:var(--text-muted);}
+  @media (max-width:840px){.foot-grid{grid-template-columns:1fr 1fr;gap:32px;}}
+
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+  <symbol id="voxel-cube" viewBox="0 0 100 100">
+    <path class="vx-top" d="M50 2 L94 25 L50 48 L6 25 Z"/>
+    <path class="vx-left" d="M6 25 L50 48 L50 96 L6 73 Z"/>
+    <path class="vx-right" d="M94 25 L50 48 L50 96 L94 73 Z"/>
+  </symbol>
+</svg>
+
+<nav class="nav">
+  <div class="wrap">
+    <a href="#" class="logo"><span class="logo-icon"><svg data-lucide="box"></svg></span>OreHost</a>
+    <div class="nav-links">
+      <a href="#fitur">Fitur</a>
+      <a href="#spesifikasi">Spesifikasi</a>
+      <a href="#paket">Paket</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">Masuk</a>
+      <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Mulai Gratis</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Buka menu"><svg data-lucide="menu"></svg></button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#fitur">Fitur</a>
+    <a href="#spesifikasi">Spesifikasi</a>
+    <a href="#paket">Paket</a>
+    <a href="#faq">FAQ</a>
+    <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block">Mulai Gratis</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="block-scene" aria-hidden="true">
+    <div class="mosaic-bg" id="heroMosaic"></div>
+    <svg class="voxel" style="width:54px;top:8%;left:6%;color:var(--grass);animation-delay:.2s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:38px;top:62%;left:3%;color:var(--dirt);animation-delay:1.4s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:46px;top:14%;left:46%;color:var(--ender);animation-delay:.8s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:34px;top:78%;left:55%;color:var(--stoneblock);animation-delay:2s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:60px;top:4%;left:88%;color:var(--diamond);animation-delay:1s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:40px;top:70%;left:92%;color:var(--accent-2);animation-delay:1.8s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Hosting Minecraft · Powered by MCServerHost</div>
+      <h1>RAM Gede. CPU Kuat.<br>Storage Lega. <span class="hl">Masih Gratis.</span></h1>
+      <p class="lead">Bikin server Minecraft sendiri tanpa drama. Mulai dari paket gratis 3.5GB RAM, upgrade kapan aja kalau member makin rame.</p>
+      <div class="hero-ctas">
+        <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Buat Server Gratis <svg data-lucide="arrow-right" style="width:16px;height:16px"></svg></a>
+        <a href="#spesifikasi" class="btn btn-ghost">Lihat Spesifikasi</a>
+      </div>
+      <p class="hero-note">Tanpa kartu kredit · Server aktif &lt;60 detik · Daftar di mcserverhost.com</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="pname"><span class="pulse-dot"></span> orehost-server-01</div>
+        <span class="status-badge">ONLINE</span>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-top">
+          <span class="stat-label"><svg data-lucide="memory-stick"></svg> RAM</span>
+          <span class="stat-val">11.2 / 16 GB</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill bar-ram" style="--w:70%"></div></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-top">
+          <span class="stat-label"><svg data-lucide="cpu"></svg> CPU</span>
+          <span class="stat-val">38%</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill bar-cpu" style="--w:38%"></div></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-top">
+          <span class="stat-label"><svg data-lucide="hard-drive"></svg> Storage</span>
+          <span class="stat-val">24 / 100 GB</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill bar-disk" style="--w:24%"></div></div>
+      </div>
+
+      <div class="panel-foot">
+        <div class="pf-item"><div class="pf-num">18/40</div><div class="pf-label">Players</div></div>
+        <div class="pf-item"><div class="pf-num">99.98%</div><div class="pf-label">Uptime</div></div>
+        <div class="pf-item"><div class="pf-num">14ms</div><div class="pf-label">Ping</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats-bar">
+  <div class="wrap">
+    <div class="stat-item"><div class="big">99.9%</div><div class="small">Uptime guarantee</div></div>
+    <div class="stat-item"><div class="big">&lt;60s</div><div class="small">Server siap dipakai</div></div>
+    <div class="stat-item"><div class="big">24/7</div><div class="small">Always online (paid)</div></div>
+    <div class="stat-item"><div class="big">Ryzen 9</div><div class="small">CPU di semua tier</div></div>
+  </div>
+</section>
+
+<section class="section-pad" id="spesifikasi">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Spesifikasi</div>
+      <h2>Spek yang Beneran Kepake, Bukan Cuma di Brosur</h2>
+      <p>Semua paket pakai NVMe SSD dan CPU dedicated — bukan resource shared yang dibagi rame-rame sama tenant lain.</p>
+    </div>
+    <div class="specs-grid">
+      <div class="slot-card">
+        <div class="slot-icon"><svg data-lucide="memory-stick"></svg></div>
+        <div class="slot-num">16 GB</div>
+        <div class="slot-label">RAM Maksimum</div>
+        <div class="slot-desc">Cukup buat modpack berat dan plugin segudang tanpa nge-lag.</div>
+      </div>
+      <div class="slot-card">
+        <div class="slot-icon"><svg data-lucide="cpu"></svg></div>
+        <div class="slot-num">6 vCPU</div>
+        <div class="slot-label">Dedicated Core</div>
+        <div class="slot-desc">Bukan di-share ke server lain — murni buat server lo doang.</div>
+      </div>
+      <div class="slot-card">
+        <div class="slot-icon"><svg data-lucide="hard-drive"></svg></div>
+        <div class="slot-num">100 GB</div>
+        <div class="slot-label">NVMe SSD Storage</div>
+        <div class="slot-desc">World gede, backup numpuk, loading tetep ngebut.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" id="fitur">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Fitur</div>
+      <h2>Lengkap dari Setup Sampai Maintenance</h2>
+      <p>Semua yang dibutuhin buat ngurus server tanpa harus jadi sysadmin dulu.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="settings-2"></svg></div><h3>Panel Kontrol Modern</h3><p>Kelola server, lihat console real-time, restart sekali klik.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="package"></svg></div><h3>Auto-Installer</h3><p>Paper, Spigot, Forge, Fabric, atau modpack CurseForge — tinggal pilih.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="history"></svg></div><h3>Backup Otomatis</h3><p>Disimpan harian, bisa di-restore sendiri kapan aja.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="shield-check"></svg></div><h3>Anti-DDoS Layer 7</h3><p>Server tetap jalan meski lagi diserang.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="database"></svg></div><h3>MySQL & FTP Gratis</h3><p>Database dan akses file penuh, nggak ada biaya tambahan.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="globe"></svg></div><h3>Subdomain Gratis</h3><p>Langsung punya alamat sendiri di *.mcsh.io, custom domain juga didukung.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="refresh-cw"></svg></div><h3>Auto-Restart</h3><p>Crash? Server nyala lagi sendiri tanpa nunggu lo online.</p></div>
+      <div class="feat-card"><div class="fc-icon"><svg data-lucide="zap"></svg></div><h3>Hardware Kelas Atas</h3><p>Ryzen 9 9950X + DDR5 RAM, NVMe SSD di semua paket berbayar.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" id="paket">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Paket · Data dari mcserverhost.com</div>
+      <h2>Pilih Tier Sesuai Kebutuhan Server</h2>
+      <p>Nama paket & harga di bawah sesuai listing resmi MCServerHost. Pendaftaran dan pembayaran berlangsung langsung di situs mereka.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="tier-card tier-coal">
+        <div class="tier-top"><div class="tier-icon"><svg data-lucide="box"></svg></div><div class="tier-name">Free</div></div>
+        <div class="tier-price">$0<span> / selamanya</span></div>
+        <div class="tier-sub">Buat testing atau main bareng circle kecil.</div>
+        <div class="tier-specs">
+          <div class="ts-row"><span>RAM</span><span>3.5 GB</span></div>
+          <div class="ts-row"><span>CPU</span><span>Ryzen 9 9950X (shared)</span></div>
+          <div class="ts-row"><span>Storage</span><span>NVMe SSD</span></div>
+          <div class="ts-row"><span>Status</span><span>Auto-sleep saat idle</span></div>
+        </div>
+        <div class="tier-feats">
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Auto-installer Paper/Forge/Fabric</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Subdomain gratis *.mcsh.io</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Perlu di-renew tiap jam biar tetap aktif</div>
+        </div>
+        <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-block">Mulai Gratis <svg data-lucide="external-link" class="ext-icon"></svg></a>
+      </div>
+
+      <div class="tier-card tier-wither featured">
+        <span class="tier-badge">PALING LARIS</span>
+        <div class="tier-top"><div class="tier-icon"><svg data-lucide="skull"></svg></div><div class="tier-name">Wither</div></div>
+        <div class="tier-price">$60<span> / bulan</span></div>
+        <div class="tier-sub">Buat server komunitas yang udah mulai rame.</div>
+        <div class="tier-specs">
+          <div class="ts-row"><span>RAM</span><span>24 GB DDR5</span></div>
+          <div class="ts-row"><span>CPU</span><span>Ryzen 9 9950X dedicated</span></div>
+          <div class="ts-row"><span>Storage</span><span>Unmetered NVMe</span></div>
+          <div class="ts-row"><span>Pemain</span><span>Hingga 96</span></div>
+        </div>
+        <div class="tier-feats">
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> 24/7 always online</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Anti-DDoS enterprise-grade</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Upgrade/downgrade kapan aja</div>
+        </div>
+        <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-block">Upgrade ke Wither <svg data-lucide="external-link" class="ext-icon"></svg></a>
+      </div>
+
+      <div class="tier-card tier-ender">
+        <div class="tier-top"><div class="tier-icon"><svg data-lucide="crown"></svg></div><div class="tier-name">Ender Dragon</div></div>
+        <div class="tier-price">$120<span> / bulan</span></div>
+        <div class="tier-sub">Buat server/network besar dengan banyak plugin & player.</div>
+        <div class="tier-specs">
+          <div class="ts-row"><span>RAM</span><span>48 GB DDR5</span></div>
+          <div class="ts-row"><span>CPU</span><span>Ryzen 9 9950X dedicated</span></div>
+          <div class="ts-row"><span>Storage</span><span>Unmetered NVMe</span></div>
+          <div class="ts-row"><span>Pemain</span><span>Hingga 192</span></div>
+        </div>
+        <div class="tier-feats">
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Semua fitur Wither</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Cocok buat network/modded besar</div>
+          <div class="tf-row"><svg data-lucide="check-circle-2"></svg> Prioritas dukungan</div>
+        </div>
+        <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-block">Upgrade ke Ender Dragon <svg data-lucide="external-link" class="ext-icon"></svg></a>
+      </div>
+    </div>
+    <p class="pricing-note">Harga bulanan di atas (billing weekly/quarterly/yearly punya diskon sampai 45% di situs asli). Butuh kapasitas di atas 48GB? Ada tier khusus network besar (Warden) — tanya tim MCServerHost langsung.</p>
+  </div>
+</section>
+
+<section class="section-pad">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">Cara Kerja</div>
+      <h2>Server Jalan dalam 4 Langkah</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">01</div><h3>Daftar</h3><p>Cuma butuh email, nggak perlu kartu kredit.</p></div>
+      <div class="step-card"><div class="step-num">02</div><h3>Pilih Versi</h3><p>Vanilla, Paper, Forge, Fabric, atau modpack — bebas.</p></div>
+      <div class="step-card"><div class="step-num">03</div><h3>Server Disiapkan</h3><p>Otomatis aktif dalam waktu kurang dari 60 detik.</p></div>
+      <div class="step-card"><div class="step-num">04</div><h3>Invite Teman</h3><p>Share IP server, langsung main bareng.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-pad" id="faq">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="eyebrow">FAQ</div>
+      <h2>Yang Sering Ditanyain</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-q">Paket gratis bener-bener gratis selamanya?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>Iya, nggak ada batas waktu trial. Tapi server gratis bakal auto-sleep kalau idle, dan perlu di-renew tiap jam lewat panel buat tetap aktif.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Kenapa tombolnya ngarah ke mcserverhost.com?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>OreHost cuma nampilin ringkasan & harga paket dari MCServerHost biar gampang dibandingin. Proses daftar, bikin server, dan pembayaran sepenuhnya berlangsung di situs mereka.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Bisa pasang plugin atau mod sendiri?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>Bisa. Tinggal upload lewat panel, atau pakai auto-installer buat Paper, Spigot, Forge, Fabric, sampai modpack CurseForge.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Apa beda paket Free, Wither, dan Ender Dragon?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>Bedanya di kapasitas RAM, jumlah pemain yang ideal, dan apakah server-nya always-on 24/7 atau auto-sleep. Detail lengkap ada di tabel paket di bagian atas.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Bisa pindah dari hosting lain?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>Bisa, tinggal upload file world dan plugin lewat panel, atau minta bantuan tim support MCServerHost buat migrasi.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Support pakai bahasa Indonesia?<svg data-lucide="chevron-down"></svg></button>
+        <div class="faq-a"><p>Iya, tim support harian pakai bahasa Indonesia lewat live chat dan Discord.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <div class="block-scene" aria-hidden="true">
+    <div class="mosaic-bg" id="ctaMosaic"></div>
+    <svg class="voxel" style="width:42px;top:12%;left:10%;color:var(--grass);animation-delay:.5s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:30px;top:68%;left:16%;color:var(--ender);animation-delay:1.6s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:50px;top:18%;left:86%;color:var(--diamond);animation-delay:.9s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+    <svg class="voxel" style="width:34px;top:66%;left:80%;color:var(--dirt);animation-delay:2.2s" viewBox="0 0 100 100"><use href="#voxel-cube"/></svg>
+  </div>
+  <div class="wrap">
+    <h2>Server Minecraft Lo, Aktif Sebelum Lo Selesai Baca Ini.</h2>
+    <p>Gratis selamanya buat mulai. Upgrade kapan aja kalau udah butuh lebih.</p>
+    <div class="hero-ctas">
+      <a href="https://www.mcserverhost.com/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Buat Server Sekarang <svg data-lucide="arrow-right" style="width:16px;height:16px"></svg></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#" class="logo"><span class="logo-icon"><svg data-lucide="box"></svg></span>OreHost</a>
+        <p>Hosting Minecraft buat siapa aja — dari server temenan sampai komunitas besar.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Produk</h4>
+        <ul><li><a href="#fitur">Fitur</a></li><li><a href="#spesifikasi">Spesifikasi</a></li><li><a href="#paket">Paket</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h4>Bantuan</h4>
+        <ul><li><a href="#faq">FAQ</a></li><li><a href="#">Status Server</a></li><li><a href="#">Kontak</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h4>Legal</h4>
+        <ul><li><a href="#">Syarat Layanan</a></li><li><a href="#">Privasi</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 OreHost. Seluruh hak cipta dilindungi.</p>
+      <p>OreHost menampilkan ringkasan paket dari pihak ketiga (MCServerHost) untuk mempermudah perbandingan. Pendaftaran & transaksi berlangsung di mcserverhost.com. Tidak berafiliasi dengan Mojang Studios maupun Microsoft.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  document.addEventListener('DOMContentLoaded', function(){
+    if (window.lucide) { lucide.createIcons(); }
+
+    // decorative block mosaic background
+    function buildMosaic(el, cols, rows){
+      if (!el) return;
+      el.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+      el.style.gridTemplateRows = 'repeat(' + rows + ',1fr)';
+      var palette = ['var(--grass)','var(--dirt)','var(--stoneblock)','var(--coal)','var(--diamond)','var(--ender)','var(--accent-2)'];
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < cols * rows; i++) {
+        var cell = document.createElement('div');
+        cell.className = 'mosaic-cell';
+        var color = palette[Math.floor(Math.random() * palette.length)];
+        cell.style.background = color;
+        cell.style.opacity = (Math.random() * 0.10 + 0.05).toFixed(2);
+        frag.appendChild(cell);
+      }
+      el.appendChild(frag);
+    }
+    buildMosaic(document.getElementById('heroMosaic'), 16, 7);
+    buildMosaic(document.getElementById('ctaMosaic'), 14, 5);
+
+    // mobile nav toggle
+    var navToggle = document.getElementById('navToggle');
+    var mobileMenu = document.getElementById('mobileMenu');
+    if (navToggle && mobileMenu) {
+      navToggle.addEventListener('click', function(){
+        mobileMenu.classList.toggle('open');
+        var icon = navToggle.querySelector('svg');
+        var isOpen = mobileMenu.classList.contains('open');
+        navToggle.setAttribute('aria-expanded', isOpen);
+        if (icon) icon.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+        if (window.lucide) lucide.createIcons();
+      });
+      mobileMenu.querySelectorAll('a').forEach(function(a){
+        a.addEventListener('click', function(){ mobileMenu.classList.remove('open'); });
+      });
+    }
+
+    // faq accordion
+    document.querySelectorAll('.faq-item').forEach(function(item){
+      var q = item.querySelector('.faq-q');
+      q.setAttribute('aria-expanded', item.classList.contains('open'));
+      q.addEventListener('click', function(){
+        var willOpen = !item.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(function(i){
+          i.classList.remove('open');
+          i.querySelector('.faq-q').setAttribute('aria-expanded', false);
+        });
+        if (willOpen) {
+          item.classList.add('open');
+          q.setAttribute('aria-expanded', true);
+        }
+      });
+    });
+
+  });
+})();
+</script>
+
+</body>
+</html>
